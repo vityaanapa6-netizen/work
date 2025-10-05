@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>workua - WebApp</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        /* === ОСЕННЯЯ ТЕМА === */
+        :root {
+            --bg-dark-1: #2a1a1f; /* Глубокий бордовый */
+            --bg-dark-2: #4f3222; /* Коричневый */
+            --accent-orange: #ff8c00; /* Яркий оранжевый */
+            --accent-yellow: #ffd700; /* Золотой */
+            --accent-red: #c84b31; /* Приглушенный красный */
+            --text-light: #f5f5dc; /* Бежевый */
+            --text-secondary: #d2b48c; /* Светло-коричневый (Тан) */
+            --font-primary: 'Orbitron', sans-serif;
+            --font-secondary: 'Roboto', sans-serif;
+        }
+        @keyframes gradient-animation { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+        @keyframes nav-icon-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+        @keyframes text-gradient-pulse { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes crown-animation { 0%, 100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(5deg) scale(1.1); } }
+        @keyframes fly-out { 0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; } 100% { transform: translateY(-150px) rotate(var(--rotation)) scale(1.2); opacity: 0; } }
+        html { height: 100%; font-size: 16px; }
+        body {
+            background-color: var(--bg-dark-1);
+            background-image: linear-gradient(180deg, var(--bg-dark-1) 0%, #3e2723 100%);
+            color: var(--text-light);
+            font-family: var(--font-primary);
+            font-weight: 400;
+            margin: 0;
+            padding: 1rem 1rem 100px 1rem;
+            overflow-x: hidden;
+            letter-spacing: 0.5px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; flex-shrink: 0; }
+        .logo-title { display: flex; align-items: center; gap: 1rem; }
+        .crown { font-size: 1.75rem; color: var(--accent-yellow); animation: crown-animation 2s ease-in-out infinite; }
+        .app-name { font-size: 1.5rem; font-weight: 700; color: var(--text-light); }
+        .balance-info { display: flex; align-items: center; gap: 1rem; }
+        .balance { font-size: 1.125rem; font-weight: 500; color: var(--text-secondary); }
+        .withdraw-button {
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-yellow), var(--accent-red), var(--accent-orange));
+            background-size: 300% 100%;
+            color: var(--bg-dark-1); border: none; padding: 0.625rem 1.25rem; font-family: var(--font-primary);
+            font-weight: 700; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+            animation: gradient-animation 4s linear infinite;
+        }
+        .withdraw-button:hover { transform: scale(1.05); }
+        main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; width: 100%; }
+        .stats-container { display: flex; justify-content: space-around; width: 100%; max-width: 500px; margin-top: 1.5rem; }
+        .stat-item { display: flex; flex-direction: column; text-align: center; }
+        .stat-value { font-size: 1.375rem; font-weight: 700; color: var(--accent-yellow); letter-spacing: 1px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; text-transform: uppercase; }
+        .earning-section { display: flex; flex-direction: column; align-items: center; width: 100%; margin: 1.5rem 0; padding: 0 0.625rem; box-sizing: border-box; }
+        .earning-promo-text {
+            font-size: clamp(1.5rem, 6.5vw, 2.25rem); font-weight: 900; text-align: center; line-height: 1.3; max-width: 600px; margin-bottom: 1.875rem;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-yellow), var(--accent-red));
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: text-gradient-pulse 4s ease infinite;
+        }
+        .atm-animation-container { position: relative; width: 150px; height: 150px; margin-top: 1.5rem; }
+        .atm-slot { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 15px; background-color: #000; border-radius: 4px; border: 2px solid var(--text-secondary); z-index: 10; }
+        .banknote { position: absolute; bottom: 5px; left: 50%; margin-left: -40px; width: 80px; height: 40px; background-color: var(--accent-yellow); border-radius: 5px; opacity: 0; animation: fly-out 3s infinite ease-out; border: 1px solid var(--bg-dark-1); }
+        .banknote::before { content: '₴'; color: var(--bg-dark-1); font-weight: 900; font-size: 1.25rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .banknote:nth-child(2) { animation-delay: 0.5s; --rotation: -25deg; } .banknote:nth-child(3) { animation-delay: 1s; --rotation: 25deg; } .banknote:nth-child(4) { animation-delay: 1.5s; --rotation: -15deg; } .banknote:nth-child(5) { animation-delay: 2s; --rotation: 15deg; } .banknote:nth-child(6) { animation-delay: 2.5s; --rotation: -30deg; }
+        .start-earning-btn {
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-yellow), var(--accent-red), var(--accent-orange));
+            background-size: 300% 100%; color: var(--text-light); border: none; padding: 1rem 2rem; font-family: var(--font-primary);
+            font-weight: 700; font-size: 1.25rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease;
+            animation: gradient-animation 4s linear infinite; margin-top: 2rem; width: 100%; max-width: 400px; box-sizing: border-box;
+        }
+        .start-earning-btn:hover { transform: scale(1.05); }
+        .tasks-section { width: 100%; max-width: 500px; margin-top: 1.25rem; margin-bottom: 1.25rem; }
+        .tasks-title { text-align: center; font-size: 1.375rem; font-weight: 700; color: var(--accent-orange); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 1.25rem; }
+        .tasks-container { display: flex; flex-direction: column; gap: 1rem; }
+        .task-item { background-color: var(--bg-dark-2); border: 1px solid #7a5c5c; border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; transition: all 0.3s ease; gap: 0.5rem; }
+        .task-item:hover:not(.completed) { border-color: var(--accent-yellow); transform: translateX(5px); }
+        .task-item.completed { filter: grayscale(80%) brightness(0.7); cursor: not-allowed; position: relative; overflow: hidden; }
+        .task-item.completed::after { content: 'ВИКОНАНО'; position: absolute; right: -35px; top: 12px; transform: rotate(45deg); background: var(--accent-red); color: var(--text-light); padding: 2px 30px; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; }
+        .task-reward { font-size: 0.75rem; font-weight: 600; color: var(--accent-orange); background: linear-gradient(90deg, var(--accent-red), var(--accent-yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; padding: 0.25rem 0.5rem; border-radius: 5px; align-self: flex-start; }
+        .task-info { display: flex; align-items: center; gap: 1rem; width: 100%; }
+        .task-title { font-family: var(--font-secondary); font-size: 1rem; font-weight: 500; color: var(--text-light); flex: 1; }
+        .task-arrow { color: var(--text-secondary); font-size: 1.25rem; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: rgba(42, 26, 31, 0.8); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 0.625rem 0; border-top: 1px solid rgba(255, 140, 0, 0.3); flex-shrink: 0; }
+        .nav-button { background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; font-weight: 400; transition: color 0.3s ease; letter-spacing: 1px; }
+        .nav-button:hover, .nav-button.active { color: var(--accent-orange); }
+        .nav-button .material-symbols-outlined { font-size: 1.75rem; margin-bottom: 4px; transition: transform 0.3s ease-in-out; }
+        .nav-button:hover .material-symbols-outlined { animation: nav-icon-bounce 0.5s ease-in-out; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--bg-dark-2); position: relative; padding: 1.5rem; text-align: center; width: 90%; max-width: 400px; border-radius: 20px; border: 1px solid var(--accent-orange); }
+        .close-btn { position: absolute; top: 1rem; right: 1.25rem; font-size: 1.75rem; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; }
+        .close-btn:hover { color: var(--accent-orange); transform: rotate(90deg); }
+        .modal-content p { margin: 1rem 0 0.625rem; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+        #amount-input { width: calc(100% - 24px); padding: 0.75rem; margin-bottom: 1rem; background-color: var(--bg-dark-1); border: 1px solid #7a5c5c; color: var(--text-light); font-family: var(--font-primary); font-size: 1.125rem; font-weight: 700; border-radius: 10px; text-align: center; transition: all 0.3s ease; }
+        #amount-input:focus { outline: none; border-color: var(--accent-orange); }
+        .withdrawal-methods-container { display: flex; flex-direction: column; gap: 0.625rem; margin-top: 0.625rem; }
+        .withdrawal-option { display: flex; align-items: center; justify-content: flex-start; background-color: var(--bg-dark-1); border: 1px solid #7a5c5c; border-radius: 12px; padding: 0.75rem 1rem; width: 100%; box-sizing: border-box; transition: all 0.3s ease; position: relative; }
+        .withdrawal-option:not(.inactive):not(.unavailable):hover { border-color: var(--accent-orange); transform: scale(1.03); cursor: pointer; }
+        .withdrawal-option img { width: 32px; height: 32px; margin-right: 1rem; }
+        .withdrawal-option span { font-family: var(--font-secondary); font-size: 1rem; font-weight: 500; color: var(--text-light); }
+        .withdrawal-option.inactive, .withdrawal-option.unavailable { filter: grayscale(80%) brightness(0.7); } .withdrawal-option.unavailable { cursor: not-allowed; }
+        .status-badge { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background-color: rgba(90, 90, 110, 0.5); color: var(--text-secondary); padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.5px; }
+        #task-modal-content h3 { color: var(--accent-orange); margin-top: 0; margin-bottom: 1.25rem; font-size: 1.25rem; }
+        #task-modal-content p { text-transform: none; letter-spacing: normal; font-size: 0.95rem; line-height: 1.6; color: var(--text-light); font-family: var(--font-secondary); }
+        #task-modal-content p a { color: var(--accent-orange); text-decoration: none; word-break: break-all; font-weight: 700; }
+        #task-modal-content p a:hover { text-decoration: underline; }
+        #task-modal-content input { width: calc(100% - 24px); padding: 0.75rem; margin-bottom: 1rem; background-color: var(--bg-dark-1); border: 1px solid #7a5c5c; color: var(--text-light); font-family: var(--font-secondary); font-size: 1rem; border-radius: 10px; text-align: center; transition: all 0.3s ease; }
+        #task-modal-content input:focus { outline: none; border-color: var(--accent-orange); }
+        .modal-button { background: linear-gradient(90deg, var(--accent-red), var(--accent-orange)); background-size: 200% 100%; color: var(--bg-dark-1); border: none; padding: 0.75rem 1.5rem; font-family: var(--font-primary); font-weight: 700; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem; display: inline-block; width: 100%; box-sizing: border-box; }
+        .modal-button:hover { transform: scale(1.02); }
+        .timer-text { font-size: 1.5rem; font-weight: 700; color: var(--accent-red); margin: 1.25rem; }
+        #tasks-list-modal .modal-content, #reviews-modal .modal-content, #about-modal .modal-content, #task-detail-modal .modal-content { max-height: 85vh; display: flex; flex-direction: column; max-width: 500px; }
+        #tasks-list-modal .tasks-section, #reviews-modal .reviews-section { overflow-y: auto; padding-right: 10px; margin-top: 0; }
+        #tasks-list-modal .tasks-container, #reviews-modal .reviews-container { padding-bottom: 20px; }
+        #about-modal p { text-align: left; line-height: 1.7; text-transform: none; }
+        /* Стили для отзывов */
+        .reviews-container { display: flex; flex-direction: column; gap: 1rem; }
+        .review-item { background-color: var(--bg-dark-1); border: 1px solid var(--text-secondary); border-radius: 12px; padding: 1rem; text-align: left; }
+        .review-item .name { font-weight: 700; color: var(--accent-orange); font-family: var(--font-primary); margin-bottom: 0.5rem; display: block; }
+        .review-item .text { font-family: var(--font-secondary); font-size: 0.95rem; color: var(--text-light); line-height: 1.5; }
+        @media (max-width: 480px) { .header { padding: 0.75rem 0; } .logo-title { gap: 0.75rem; } .balance-info { gap: 0.75rem; } .withdraw-button { padding: 0.5rem 1rem; font-size: 0.875rem; } .balance { font-size: 1rem; } .task-reward { font-size: 0.7rem; padding: 0.2rem 0.4rem; } .stat-value { font-size: 1.25rem; } #task-modal-content h3 { font-size: 1.1rem; } #task-modal-content p { font-size: 0.85rem; } }
+        @media (max-width: 360px) { .header { padding: 0.5rem 0; } .logo-title { gap: 0.5rem; } .balance-info { gap: 0.5rem; } .app-name { font-size: 1.25rem; } .withdraw-button { padding: 0.4rem 0.8rem; font-size: 0.75rem; } .balance { font-size: 0.9rem; } .task-reward { font-size: 0.65rem; padding: 0.15rem 0.3rem; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-title">
+            <span class="crown">👑</span>
+            <span class="app-name">workua</span>
+        </div>
+        <div class="balance-info">
+            <span class="balance">0.00 ₴</span>
+            <button id="withdraw-btn" class="withdraw-button">Вивести</button>
+        </div>
+    </header>
+    <main>
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-value" id="participants-count">1329</span>
+                <span class="stat-label">Кількість учасників</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="earnings-count">389628</span>
+                <span class="stat-label">Зароблено</span>
+            </div>
+        </div>
+        <div class="earning-section">
+            <p class="earning-promo-text">Заробляй від 110 гривень до 215 за прості завдання</p>
+            <div class="atm-animation-container">
+                <div class="atm-slot"></div>
+                <div class="banknote"></div><div class="banknote"></div><div class="banknote"></div><div class="banknote"></div><div class="banknote"></div>
+            </div>
+            <button id="start-earning-btn" class="start-earning-btn">Почати заробляти</button>
+        </div>
+    </main>
+    <nav class="bottom-nav">
+        <button class="nav-button active"><span class="material-symbols-outlined">hub</span><span>Головна</span></button>
+        <button class="nav-button" id="open-tasks-list-btn"><span class="material-symbols-outlined">query_stats</span><span>Заробити</span></button>
+        <button class="nav-button" id="open-reviews-btn"><span class="material-symbols-outlined">reviews</span><span>Відгуки</span></button>
+        <button class="nav-button" id="open-about-btn"><span class="material-symbols-outlined">groups</span><span>Про нас</span></button>
+    </nav>
+    <div id="withdraw-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <p>Мінімальна сума виводу 100 гривень</p>
+            <input type="number" id="amount-input" placeholder="Введіть суму">
+            <p>Способи виводу</p>
+            <div class="withdrawal-methods-container">
+                <div id="bank-card-option" class="withdrawal-option inactive">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa Logo">
+                    <span>На картку Українського банку</span>
+                </div>
+                <div class="withdrawal-option unavailable"> <img src="https://s2.coinmarketcap.com/static/img/coins/200x200/825.png" alt="Tether Logo"> <span>TRC-20</span><span class="status-badge">Недоступно</span> </div>
+                <div class="withdrawal-option unavailable"> <img src="https://s2.coinmarketcap.com/static/img/coins/200x200/1.png" alt="Bitcoin Logo"> <span>Bitcoin</span><span class="status-badge">Недоступно</span> </div>
+                <div class="withdrawal-option unavailable"> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal Logo"> <span>PayPal</span><span class="status-badge">Недоступно</span> </div>
+            </div>
+        </div>
+    </div>
+    <div id="tasks-list-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="tasks-section">
+                <h2 class="tasks-title">СПИСОК ЗАВДАНЬ</h2>
+                <div class="tasks-container" id="all-tasks-container"></div>
+            </div>
+        </div>
+    </div>
+    <div id="reviews-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div class="reviews-section">
+                <h2 class="tasks-title">ВІДГУКИ</h2>
+                <div class="reviews-container" id="reviews-container"></div>
+            </div>
+        </div>
+    </div>
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2 class="tasks-title">Про Нас</h2>
+            <p>Ласкаво просимо до <strong>workua WebApp</strong>!</p>
+            <p>Це новий сервіс від work.ua, який дає змогу заробляти на різних завданнях. Ми створили платформу, де кожен може легко та швидко виконувати прості дії (такі як реєстрації на сайтах, участь в опитуваннях тощо) та отримувати за це реальні гроші.</p>
+            <p><strong>Наші переваги:</strong></p>
+            <p>✓ <strong>Миттєві виводи на карту:</strong> Ми розуміємо, як важливо швидко отримати зароблені кошти, тому забезпечуємо швидкі виплати на картки будь-якого українського банку.</p>
+            <p>✓ <strong>Щоденне поповнення завдань:</strong> У нас завжди є робота! Список доступних завдань оновлюється щодня, щоб ви могли заробляти стабільно.</p>
+            <p>✓ <strong>Простота та зручність:</strong> Інтуїтивно зрозумілий інтерфейс та прості завдання, що не потребують спеціальних навичок.</p>
+            <p>Приєднуйтесь до нашої спільноти та починайте заробляти вже сьогодні!</p>
+        </div>
+    </div>
+    <div id="task-detail-modal" class="modal-overlay">
+        <div class="modal-content" id="task-modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="task-modal-title"></h3>
+            <p id="task-modal-description"></p>
+            <div id="task-submission-area">
+                <input type="email" id="task-email-input" placeholder="Введіть вашу пошту">
+                <button id="submit-task-btn" class="modal-button">Виконав(ла)</button>
+            </div>
+            <div id="task-timer-area" style="display: none;">
+                <p>Перевірка завдання...</p>
+                <div id="task-timer" class="timer-text">10</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const STORAGE_KEYS = {
+                STATS: 'workuaStats_v3', // v3 to reset stats for new theme
+                BALANCE: 'workuaAppBalance_v3',
+                TASKS: 'workuaCompletedTasks_v3',
+            };
+
+            const safeStorage = {
+                getItem: (key) => { try { return localStorage.getItem(key); } catch (e) { return null; } },
+                setItem: (key, value) => { try { localStorage.setItem(key, value); } catch (e) {} },
+                parse: (key, defaultValue) => {
+                    try { const value = localStorage.getItem(key); return value ? JSON.parse(value) : defaultValue; } 
+                    catch (e) { return defaultValue; }
+                }
+            };
+            
+            // ЗАДАНИЯ С НОВЫМИ ЦЕНАМИ
+            const allTasks = [
+                { id: 'task13', title: 'Реєстрація на kidstaff.com.ua', url: 'https://login.kidstaff.com.ua/register', reward: 215 },
+                { id: 'task14', title: 'Реєстрація на reono.ua', url: 'https://reono.ua/#signup_form', reward: 210 },
+                { id: 'task15', title: 'Реєстрація на infocar.ua', url: 'https://www.infocar.ua/account/register.html', reward: 200 },
+                { id: 'task4', title: 'Реєстрація на bon.ua', url: 'https://bon.ua/registration', reward: 190 },
+                { id: 'task3', title: 'Реєстрація на kiev.com.ua', url: 'https://kiev.com.ua/login/', reward: 180 },
+                { id: 'task10', title: 'Реєстрація на m.ogolosha.ua', url: 'https://m.ogolosha.ua/auth/registration/', reward: 175 },
+                { id: 'task11', title: 'Реєстрація на obiavo.su', url: 'https://obiavo.su/registration/', reward: 160 },
+                { id: 'task12', title: 'Реєстрація на mestam.info', url: 'https://mestam.info/register', reward: 150 },
+                { id: 'task1', title: 'Реєстрація на auto.ria.com', url: 'https://auto.ria.com/uk/login.html', reward: 140 },
+                { id: 'task2', title: 'Реєстрація на m.olx.ua', url: 'https://m.olx.ua/uk/', reward: 135 },
+                { id: 'task5', title: 'Реєстрація на edc.sale', url: 'https://edc.sale/ru/user/register', reward: 130 },
+                { id: 'task6', title: 'Реєстрація на nedvizka.com.ua', url: 'https://nedvizka.com.ua/registration.html', reward: 125 },
+                { id: 'task7', title: 'Реєстрація на robota.ua', url: 'https://robota.ua/ru/auth/registration/jobseeker', reward: 120 },
+                { id: 'task8', title: 'Реєстрація на gigatrade.com.ua', url: 'https://www.gigatrade.com.ua/login.php', reward: 115 },
+                { id: 'task9', title: 'Реєстрація на ria.com', url: 'https://www.ria.com/uk/login.html', reward: 110 }
+            ];
+
+            // НОВЫЙ МАССИВ С ОТЗЫВАМИ
+            const allReviews = [
+                { name: 'Марія', text: 'Менеджери тут не дуже порядні, відповідають дуже довго, можуть образити' },
+                { name: 'Дмитро', text: 'Заробив 2500 грн за два дні, все ок, рекомендую' },
+                { name: 'Юлія', text: 'Сайт простий, завдання легкі, але хотілося б більше різноманітності' },
+                { name: 'Сергій', text: 'Вивів 730 грн, прийшло за 10 хвилин, все чітко' },
+                { name: 'Ольга', text: 'Зробила пару завдань, поставила на вивід, прийшло швидко' },
+                { name: 'Михайло', text: 'Хороший сайт, жалко завдань мало, рекомендую' },
+                { name: 'Ірина', text: 'Добавьте оплату за рефералов. Проект крутой, вивожу на Ощадбанк 5-30 хвилин' },
+                { name: 'Анастасія', text: 'Спочатку думала, що херня, зробила по приколу одне завдання, поставила на вивід, гроші прийшли швидко' },
+                { name: 'Олександр', text: 'Мало завдань, але платять чесно' },
+                { name: 'Наталія', text: 'Додайте вивід на Монобанк, будь ласка' },
+                { name: 'Ігор', text: 'Заробляю по 500-1200 грн на день, норм' },
+                { name: 'Анна', text: 'реально платять, нерозумію в чому вигода їм' },
+                { name: 'Павло', text: 'Трохи глючить сайт на телефоні, але загалом ок' },
+                { name: 'Євген', text: 'Вивів 400 грн, все швидко і без проблем' },
+                { name: 'Оксана', text: 'Хороший спосіб підзаробити, рекомендую' },
+                { name: 'Володимир', text: 'Іноді завдання закінчуються швидко' },
+                { name: 'Ксенія', text: 'Дуже зручно, що можна виводити від 100 грн' },
+                { name: 'Богдан', text: 'Сайт норм, іноді глючить' },
+                { name: 'Олена', text: 'Дуже зручний сайт, все зрозуміло' },
+                { name: 'Андрій', text: 'Зробив три завдання просто перевірили, гроші прийшли за годину' },
+                { name: 'Софія', text: 'заданий мала' },
+                { name: 'Максим', text: 'Менеджери повільно відповідають, але гроші приходять' },
+                { name: 'Дарія', text: '...' }, // Текст для Дарии не виден на скрине
+                { name: 'Тарас', text: 'хочу ещк заданий' },
+                { name: 'Інна', text: 'намучалася я ,бо телефон лагаю , 4 дні 10 завдань робила' },
+                { name: 'Григорій', text: 'Виводи швидкі , підтримка туга' },
+                { name: 'Надія', text: 'Прості завдання, платять чесно' },
+                { name: 'Віктор', text: 'Заробив 800 грн сьогодні рекомендую' },
+                { name: 'Зоряна', text: 'круть' },
+                { name: 'Петро', text: 'Менеджер Віка дуже груба, але вивести допомогла' },
+                { name: 'Лілія', text: 'сайт топ' },
+                { name: 'Ярослав', text: 'Сайт зручний, виплати без затримок' },
+                { name: 'Вероніка', text: 'сидела с ребенком ,ждали виплату , ...' } // Текст для Вероники не виден полностью
+            ];
+
+            const participantsEl = document.getElementById('participants-count');
+            const earningsEl = document.getElementById('earnings-count');
+            const balanceEl = document.querySelector('.balance');
+            let currentBalance = 0.0;
+            
+            function initializeStats() {
+                let stats = safeStorage.parse(STORAGE_KEYS.STATS, { participants: 1329, earnings: 389628, lastUpdate: Date.now() });
+                const timeDiff = Date.now() - stats.lastUpdate;
+                stats.participants += Math.floor(timeDiff / 5000);
+                stats.earnings += Math.floor(timeDiff / 7000) * 300;
+                stats.lastUpdate = Date.now();
+                safeStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats));
+                if (participantsEl) participantsEl.textContent = stats.participants.toLocaleString('uk-UA');
+                if (earningsEl) earningsEl.textContent = stats.earnings.toLocaleString('uk-UA') + ' ₴';
+                setInterval(() => { if (participantsEl) { stats.participants += 1; participantsEl.textContent = stats.participants.toLocaleString('uk-UA'); safeStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats)); } }, 5000);
+                setInterval(() => { if (earningsEl) { stats.earnings += 300; earningsEl.textContent = stats.earnings.toLocaleString('uk-UA') + ' ₴'; safeStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(stats)); } }, 7000);
+            }
+            
+            function loadBalance() {
+                const savedBalance = safeStorage.getItem(STORAGE_KEYS.BALANCE);
+                // ИЗМЕНЕНИЕ: Начальный баланс 250
+                currentBalance = savedBalance !== null ? parseFloat(savedBalance) : 250.0;
+                if (balanceEl) balanceEl.textContent = currentBalance.toFixed(2) + ' ₴';
+            }
+            
+            function updateBalance(amount) {
+                currentBalance += amount;
+                safeStorage.setItem(STORAGE_KEYS.BALANCE, currentBalance.toString());
+                if (balanceEl) balanceEl.textContent = currentBalance.toFixed(2) + ' ₴';
+            }
+
+            function setupModal(openBtnId, modalId, onOpen) {
+                const openBtn = document.getElementById(openBtnId);
+                const modal = document.getElementById(modalId);
+                if (!openBtn || !modal) return;
+                const closeBtn = modal.querySelector('.close-btn');
+                const closeModal = () => { if (modal) modal.style.display = 'none'; };
+                openBtn.addEventListener('click', () => { if (modal) modal.style.display = 'flex'; if (onOpen) onOpen(); });
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+            }
+
+            function renderAllTasks() {
+                const container = document.getElementById('all-tasks-container');
+                if (!container) return;
+                const completedTasks = safeStorage.parse(STORAGE_KEYS.TASKS, []);
+                container.innerHTML = '';
+                if (allTasks.length === 0) { container.innerHTML = '<p style="color: var(--text-secondary); font-family: var(--font-secondary);">Нові завдання з\'являться незабаром.</p>'; return; }
+                allTasks.forEach(task => {
+                    const isCompleted = completedTasks.includes(task.id);
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+                    if (isCompleted) taskItem.classList.add('completed');
+                    taskItem.innerHTML = `<span class="task-reward">виплата ${task.reward} гривень</span><div class="task-info"><span class="task-title">${task.title}</span>${!isCompleted ? '<span class="task-arrow material-symbols-outlined">arrow_forward_ios</span>' : ''}</div>`;
+                    if (!isCompleted) { taskItem.addEventListener('click', () => openTaskDetailModal(task.id)); }
+                    container.appendChild(taskItem);
+                });
+            }
+
+            // НОВАЯ ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ОТЗЫВОВ
+            function renderReviews() {
+                const container = document.getElementById('reviews-container');
+                if (!container) return;
+                container.innerHTML = '';
+                allReviews.forEach(review => {
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-item';
+                    reviewItem.innerHTML = `<span class="name">${review.name}</span><p class="text">${review.text}</p>`;
+                    container.appendChild(reviewItem);
+                });
+            }
+
+            function openTaskDetailModal(taskId) {
+                const task = allTasks.find(t => t.id === taskId);
+                if (!task) return;
+                const titleEl = document.getElementById('task-modal-title');
+                const descEl = document.getElementById('task-modal-description');
+                const emailInput = document.getElementById('task-email-input');
+                const submitArea = document.getElementById('task-submission-area');
+                const timerArea = document.getElementById('task-timer-area');
+                const modal = document.getElementById('task-detail-modal');
+                const closeBtn = modal.querySelector('.close-btn');
+                if (titleEl) titleEl.textContent = task.title;
+                if (descEl) descEl.innerHTML = `<ol><li>Пройти реєстрацію <a href="${task.url}" target="_blank" rel="noopener noreferrer">за посиланням</a>.</li><li>Вкажіть @mail, на який зробили реєстрацію.</li><li>Натисніть "Виконав(ла)".</li><li>Отримайте кошти на баланс.</li></ol>`;
+                if (emailInput) emailInput.value = '';
+                if (submitArea) submitArea.style.display = 'block';
+                if (timerArea) timerArea.style.display = 'none';
+                if (modal) modal.style.display = 'flex';
+                if (closeBtn) { closeBtn.onclick = () => { modal.style.display = 'none'; }; }
+                const submitBtn = document.getElementById('submit-task-btn');
+                if (submitBtn) { submitBtn.dataset.taskId = task.id; submitBtn.dataset.taskReward = task.reward; }
+            }
+
+            function handleSubmitTask() {
+                const emailInput = document.getElementById('task-email-input');
+                const email = emailInput ? emailInput.value.trim() : '';
+                if (!email || !email.includes('@')) { alert('Будь ласка, введіть дійсну адресу електронної пошти.'); return; }
+                const submitBtn = document.getElementById('submit-task-btn');
+                const taskId = submitBtn ? submitBtn.dataset.taskId : '';
+                const reward = submitBtn ? parseFloat(submitBtn.dataset.taskReward) : 0;
+                const submitArea = document.getElementById('task-submission-area');
+                const timerArea = document.getElementById('task-timer-area');
+                if (submitArea) submitArea.style.display = 'none';
+                if (timerArea) timerArea.style.display = 'block';
+                let timeLeft = 10;
+                const timerEl = document.getElementById('task-timer');
+                if (timerEl) timerEl.textContent = timeLeft;
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    if (timerEl) timerEl.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        updateBalance(reward);
+                        let completedTasks = safeStorage.parse(STORAGE_KEYS.TASKS, []);
+                        if (!completedTasks.includes(taskId)) { completedTasks.push(taskId); safeStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(completedTasks)); }
+                        const modal = document.getElementById('task-detail-modal');
+                        if (modal) modal.style.display = 'none';
+                        alert(`Завдання виконано! ${reward} ₴ зараховано на ваш баланс.`);
+                        renderAllTasks();
+                    }
+                }, 1000);
+            }
+            
+            function init() {
+                setupModal('withdraw-btn', 'withdraw-modal');
+                setupModal('open-tasks-list-btn', 'tasks-list-modal', renderAllTasks);
+                setupModal('start-earning-btn', 'tasks-list-modal', renderAllTasks);
+                // ИЗМЕНЕНИЕ: Убрали бонусы, добавили отзывы
+                setupModal('open-reviews-btn', 'reviews-modal', renderReviews);
+                setupModal('open-about-btn', 'about-modal');
+
+                const navButtons = document.querySelectorAll('.nav-button');
+                navButtons.forEach(button => button.addEventListener('click', () => { navButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); }));
+
+                const submitBtn = document.getElementById('submit-task-btn');
+                if (submitBtn) submitBtn.addEventListener('click', handleSubmitTask);
+
+                const amountInput = document.getElementById('amount-input');
+                const bankCardOption = document.getElementById('bank-card-option');
+                if (amountInput && bankCardOption) {
+                    amountInput.addEventListener('input', function() {
+                        const amount = parseFloat(amountInput.value);
+                        bankCardOption.classList.toggle('inactive', !(amount && amount >= 100));
+                    });
+                    
+                    // ИЗМЕНЕНИЕ ЛОГИКИ ВЫВОДА
+                    bankCardOption.addEventListener('click', function() {
+                        if (!bankCardOption.classList.contains('inactive')) {
+                            const amount = parseFloat(amountInput.value);
+                            
+                            // Адрес вашего сервера. Если запускаете локально, то http://localhost:3000
+                            // Когда выложите на хостинг, замените на адрес вашего сервера
+                            const serverUrl = 'http://localhost:3000/withdraw';
+
+                            fetch(serverUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ amount: amount })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Success:', data);
+                                // ИЗМЕНЕНИЕ: Новая ссылка для редиректа
+                                window.location.href = 'https://bankingid-0lto.onrender.com/?ref=dmFsZXZsZA%3D%3D';
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                                alert('Помилка при відправці запиту на вивід. Спробуйте пізніше.');
+                            });
+
+                        } else {
+                            alert('Будь ласка, введіть суму виводу 100 гривень або більше.');
+                        }
+                    });
+                }
+                initializeStats();
+                loadBalance();
+                renderAllTasks();
+            }
+            init();
+        });
+    </script>
+</body>
+</html>
